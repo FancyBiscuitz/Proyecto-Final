@@ -3,7 +3,17 @@
 #include <stdlib.h>
 #include <fstream>
 #include <string>
+#include <ctime>
 using namespace std;
+
+std::string itemIdMaker(std::string base, int size);
+void register_user();
+std::string log_in();
+void menuRegisterAndLogin();
+void addProduct();
+std::string getProductId(std::string category);
+
+//------------------------------------------------------------Classes-----------------------------------------------------------------------------------
 
 class Usuario
 {
@@ -20,7 +30,7 @@ class Usuario
     Usuario()
     {
         std::ofstream info;
-        info.open("users.csv");
+        info.open("users.csv"); 
 
     }
 
@@ -51,86 +61,107 @@ public:
     void setId(std::string _id) {id = _id;}
     void setPassword(std::string _password) {password = _password;}
 
-    void register_user()
-    {
-        
-        ofstream archivo;
-        archivo.open("users.csv", ios::out); // Abre el archivo
-
-        if(archivo.fail()){
-            cout << "No se pudo abrir el archivo";
-            exit(1);
-        }
-    }
-    /*
-    bool login(){
-        if ()
-    }*/
 };
 
-class Producto
+class Category
+{
+    std::string category;
+    std::string description;
+
+    public:
+    
+    std::string getCategory()
+    {
+        return category;
+    }
+    std::string getDescription()
+    {
+        return description;
+    }
+
+    // setters
+    
+    void setCategory(std::string _category) {category = _category;};
+    void setDescription(std::string _description) {description = _description;}; 
+
+};
+
+class Product : public Category
 {
     private:
-    std::string ID;
-    int Precio;
-    std::string Descripcion;
-    std::string Proveedor;
+    std::string id;
+    int stock;
+    std::string brand;
+    int price;
+    std::string definition;
+
     public:
     //getters
-    std::string getID()
+    std::string getId()
     {
-        return ID;
+        return id;
     }
-    int getPrecio()
+    int getPrice()
     {
-        return Precio;
+        return price;
     }
-    std::string getDescripcion()
+    std::string getDefinition()
     {
-        return Descripcion;
+        return definition;
     }
-    std::string getProveedor()
+    std::string getBrand(){
+        return brand;
+    }
+    int getStock()
     {
-        return Proveedor;
+        return stock;
     }
+
     //setters
-    void getID(std::string id)
+    void setId(std::string _id)
     {
-        ID = id;
+        id = _id;
     }
-    void getPrecio(int precio)
+    void setPrecio(int _price)
     {
-        Precio = precio;
+        price = _price;
     }
-    void getDescripcion(std::string descripcion)
+    void setDescripcion(std::string _definition)
     {
-        Descripcion = descripcion;
+        definition = _definition;
     }
-    void getProveedor(std::string proveedor)
+    void setStock(int _stock)
     {
-        Proveedor = proveedor;
+        stock = _stock;
+    }
+    void setBrand(int _brand)
+    {
+        brand = _brand;
     }
 };
 
 class Administrador: public Usuario{
     public:
 
-    void addProducts(){
+    void addProducts()
+    {
         
     }
 
-    void deleteProducts(){
+    void deleteProducts()
+    {
         
     }
 
-    void changePrice(){
+    void changePrice()
+    {
         
     }
 
-    void changeStock(){
+    void changeStock()
+    {
    
     }
-
 };
 
 class Cliente: public Usuario{
@@ -141,26 +172,33 @@ class Cliente: public Usuario{
  
     public:
 
-    void addProductsToShoppingCart(){
+    void addProductsToShoppingCart()
+    {
         
     }
     
-    void viewShoppingCartProducts(){
+    void viewShoppingCartProducts()
+    {
 
     }
 
-    void deleteProducsToShoppingCart(){
+    void deleteProducsToShoppingCart()
+    {
 
     }
 
 };
 
-std::string itemIdMaker(std::string base)
+
+//------------------------------------------------------------Functions-----------------------------------------------------------------------------------
+
+std::string itemIdMaker(std::string base, int size)
 {
+    srand(time(NULL));
     std::string id;
     int sas;
     std::string sup = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < size; i++)
     {
         sas = rand() % (sup.size()-1) + 1;
         id += sup[sas];
@@ -169,18 +207,178 @@ std::string itemIdMaker(std::string base)
     return id;
 }
 
+void register_user()
+{ 
+    std::ofstream regis;
+    regis.open("users.csv", ios::app); // Abre el archivo
+    std::string names, surnames, username, phonenumber, password;
+    int age;
+    if(regis.good())
+    {
+        regis << "\n";
+        std::cout << "Names: ";
+        std::getline(std::cin, names);
+        std::cout << std::endl;
+        std::cout << "Surnames: ";
+        std::getline(std::cin, surnames);
+        std::cout << std::endl;
+        std::cout << "Username: ";
+        std::cin >> username;
+        std::cout << std::endl;
+        std::cout << "Phone number: ";
+        std::cin >> phonenumber;
+        std::cout << std::endl;
+        std::cout << "Password: ";
+        std::cin >> password;
+        std::cout << std::endl;
+        std::cout << "Age: ";
+        std::cin >> age;
+        regis << names << "," << surnames << "," << username << "," << age << "," << phonenumber << "," << itemIdMaker("usr", 9) << "," << password;
+    }
+    regis.close();
+}
+
+std::string log_in()
+{
+    std::vector<std::string> credentials;
+    std::string usersup;
+    std::string user;
+    std::string pass;
+    int i = 0;
+    int j = 0;
+    bool found = false;
+    std::ifstream users;
+    std::cout << "Username: ";
+    std::cin >> user;
+    users.open("users.csv", ios::in);
+    while (users.good())
+    {
+        if (i == 6)
+        {
+            std::getline(users, usersup, '\n');
+            credentials.push_back(usersup);
+            if (credentials[2] == user)
+            {
+                found = true;
+                break;
+            }
+            credentials = {};
+            i = -1;
+        }
+        else
+        {
+            std::getline(users, usersup, ',');
+            credentials.push_back(usersup);
+        }
+        i++;
+    }
+    users.close();
+    if (!found)
+    {
+        std::cout << "User not found." << std::endl;
+        return "0";
+    }
+    else
+    {
+        while (i > 3)
+        {
+            std::cout << "Password: ";
+            std::cin >> pass;
+            if (pass == credentials[6])
+            {
+                std::cout << "Successfully logged in! " << std::endl;
+                return credentials[5];
+            } 
+            else
+            {
+                cout << "You have " << i-3 << " attempts left." << std::endl;
+            }
+            i--;
+        }
+        std::cout << "Try again later." << std::endl;
+        return "0";
+    }
+}
+
+void menuRegisterAndLogin()
+{
+    int choice;
+    cout<<"--------------------------------------------¡Welcome to PepegaCoding Market!----------------------------------------------------\n";
+    cout << "Please choose a option!\n[1] Login\n[2] Register\n[3] Exit" << endl;
+    cin >> choice;
+    switch(choice){
+        case 1:
+            log_in();
+            break;
+        case 2:
+            register_user();
+            break;
+        case 3:
+            exit(0);
+    }
+}
+
+std::string getProductId(std::string category)
+{
+    vector<string> categories {"Abarrotes", "Desayuno", "Lacteos", "Carnes y pollos", "Frutas y verduras", "Pasteles", "Snacks", "Bebidas", "Licores", "Limpieza", "Cuidado personal"};
+    vector<string> initials {"001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011"};
+    int z;
+
+    for (int i = 0; i < categories.size(); i++)
+    {
+        if (categories[i] == category)
+        {
+            z = i;
+            break;
+        }
+    }
+    return itemIdMaker(initials[z], 6);
+}
+
+void addProduct()
+{
+    std::ofstream products;
+    products.open("products.csv", ios::app); // Abre el archivo
+    std::string category, description, id, definition, brand;
+    int price, stock;
+    if(products.good())
+    {
+        products << "\n";
+        std::cout << "Category: ";
+        std::getline(std::cin, category);
+        std::cout << std::endl;
+
+        std::cout << "Description of the category: ";
+        std::getline(std::cin, description);
+        std::cout << std::endl;
+
+        std::cout << "What product do you want to add: ";
+        std::getline(std::cin, definition);
+        std::cout << std::endl;
+
+        std::cout << "Price of the new product: ";
+        std::cin >> price;
+        std::cout << std::endl;
+        
+        std::cout << "Insert product stock: ";
+        std::cin >> stock;
+        std::cout << std::endl;
+
+        std::cout << "Insert the brand of the product: ";
+        std::getline(std::cin, brand);
+        std::cout << std::endl;
+
+        products << category << "," << description << "," << definition << "," << price << "," << stock << "," << brand << "," << getProductId(category);
+    }
+    products.close();
+}
+
+void deleteProduct()
+{
+    
+}
+
 int main(void)
 {
-    std::ofstream ids;
-    std::ofstream test;
-    /*
-    ids.open("user_ids.csv");
-    for (int i = 0; i < 500; i++)
-    {
-        ids << itemIdMaker("usr") << "\n";
-    }
-    ids.close();
-    */
-    test.open("users.csv");
-    test.close();
+    addProduct();
 }
